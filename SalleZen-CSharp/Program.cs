@@ -1,26 +1,12 @@
-using MongoDB.Driver;
+using Microsoft.EntityFrameworkCore;
+using RecommendationList.Data;
 using RecommendationList.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-// Charger la configuration MongoDB depuis appsettings.json
-var mongoSettings = builder.Configuration.GetSection("MongoDB");
-
-// Ajouter MongoDB en tant que service (enregistré comme singleton ici)
-builder.Services.AddSingleton<IMongoClient>(s =>
-{
-    var connectionString = mongoSettings["ConnectionString"];
-    return new MongoClient(connectionString);
-});
-
-builder.Services.AddSingleton(s =>
-{
-    var client = s.GetRequiredService<IMongoClient>();
-    var databaseName = mongoSettings["DatabaseName"];
-    return client.GetDatabase(databaseName);
-});
+// Service de base de données SQL Server
+builder.Services.AddDbContext<RecommendationsListsDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("RecommendationsListsDbConnection")));
 
 // Ajouter les services CORS
 builder.Services.AddCors(options =>
@@ -28,19 +14,16 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAngularApp",
         builder =>
         {
-            builder.WithOrigins("http://localhost:4200", "http://localhost:7222", "https://sallezen.com") // Remplace avec l'URL de ton application Angular
+            builder.WithOrigins("http://localhost:4200", "http://localhost:7222", "https://sallezen.com") 
                    .AllowAnyHeader()
                    .AllowAnyMethod()
-                   .AllowCredentials(); // Facultatif, si tu veux autoriser les cookies ou l'authentification
+                   .AllowCredentials(); 
         });
 });
 
 // Enregistrer RecommendationService comme Singleton
-builder.Services.AddSingleton<RecommendationService>();
-
+builder.Services.AddScoped<RecommendationService>();
 builder.Services.AddControllers();
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -56,9 +39,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

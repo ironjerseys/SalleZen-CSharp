@@ -1,30 +1,51 @@
-﻿using MongoDB.Driver;
+﻿using Microsoft.EntityFrameworkCore;
+using RecommendationList.Data;
 using RecommendationList.Model;
 
 namespace RecommendationList.Service;
-
 public class RecommendationService
 {
-    private readonly IMongoCollection<Recommendation> _recommendations;
+    private readonly RecommendationsListsDbContext _context;
 
-    public RecommendationService(IMongoDatabase database)
+    public RecommendationService(RecommendationsListsDbContext context)
     {
-        _recommendations = database.GetCollection<Recommendation>("recommendation");
+        _context = context;
     }
 
+    // Récupère toutes les recommandations
     public async Task<List<Recommendation>> GetAllAsync() =>
-        await _recommendations.Find(recommendation => true).ToListAsync();
+        await _context.Recommendations.ToListAsync();  
 
-    public async Task<Recommendation> GetByIdAsync(string id) =>
-        await _recommendations.Find<Recommendation>(rec => rec.id == id).FirstOrDefaultAsync();
+    // Récupère une recommandation par ID
+    public async Task<Recommendation> GetByIdAsync(Guid id) =>
+        await _context.Recommendations.FindAsync(id); 
 
-    public async Task CreateAsync(Recommendation recommendation) =>
-        await _recommendations.InsertOneAsync(recommendation);
+    // Crée une nouvelle recommandation
+    public async Task CreateAsync(Recommendation recommendation)
+    {
+        await _context.Recommendations.AddAsync(recommendation);  
+        await _context.SaveChangesAsync();  
+    }
 
-    public async Task UpdateAsync(string id, Recommendation recommendationIn) =>
-        await _recommendations.ReplaceOneAsync(rec => rec.id == id, recommendationIn);
+    // Met à jour une recommandation existante
+    public async Task UpdateAsync(Guid id, Recommendation recommendationIn)
+    {
+        var recommendation = await _context.Recommendations.FindAsync(id);
+        if (recommendation != null)
+        {
+            _context.Entry(recommendation).CurrentValues.SetValues(recommendationIn);
+            await _context.SaveChangesAsync(); 
+        }
+    }
 
-    public async Task DeleteAsync(string id) =>
-        await _recommendations.DeleteOneAsync(rec => rec.id == id);
+    // Supprime une recommandation par ID
+    public async Task DeleteAsync(Guid id)
+    {
+        var recommendation = await _context.Recommendations.FindAsync(id);
+        if (recommendation != null)
+        {
+            _context.Recommendations.Remove(recommendation);  
+            await _context.SaveChangesAsync();  
+        }
+    }
 }
-

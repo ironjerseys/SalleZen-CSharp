@@ -1,66 +1,47 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace RecommendationList.Model
+namespace RecommendationList.Model;
+
+public class Recommendation
 {
-    // Indique à MongoDB que cette classe est un document
-    [BsonIgnoreExtraElements]
-    public class Recommendation
+    [JsonConverter(typeof(JsonStringEnumConverter))] 
+    public enum Categories
     {
-        // Enum pour les catégories de recommandation
-        [JsonConverter(typeof(JsonStringEnumConverter))] // Sérialise et désérialise en tant que chaîne dans JSON
-        public enum Categories
-        {
-            Movie,
-            VideoGame,
-            TVshow,
-            Music,
-            YoutubeVideo,
-            Book
-        }
+        Movie,
+        VideoGame,
+        TVshow,
+        Music,
+        YoutubeVideo,
+        Book
+    }
 
-        // ID du document, représenté comme un ObjectId dans MongoDB
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)] // Indique que cet ID sera un ObjectId
-        public string id { get; set; } // Utilisation de la convention PascalCase pour les propriétés publiques
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public Guid Id { get; set; } 
 
-        // Nom de la recommandation
-        [Required]
-        [BsonElement("name")] // Optionnel : Pour explicitement définir le champ dans MongoDB
-        public string Name { get; set; }
+    [Required]
+    public string Name { get; set; }
 
-        // Auteur de la recommandation
-        [BsonElement("author")]
-        public string Author { get; set; }
+    public string Author { get; set; }
 
-        // Description de la recommandation
-        [BsonElement("description")]
-        public string Description { get; set; }
+    public string Description { get; set; }
 
-        // Date de la recommandation
-        [BsonElement("date")]
-        public DateTime Date { get; set; }
+    public DateTime RecommendationDate { get; set; }
 
-        // Catégorie, enregistrée sous forme de chaîne dans MongoDB
-        [BsonElement("category")]
-        [BsonRepresentation(BsonType.String)] // Enregistre l'énumération comme une chaîne dans MongoDB
-        public Categories category { get; set; }
+    [Column(TypeName = "nvarchar(50)")]
+    public Categories category { get; set; }
 
-        // Constructeur par défaut
-        public Recommendation() { }
+    public Recommendation() { }
 
-        // Constructeur avec paramètres
-        public Recommendation(string id, string name, string author, string description, DateTime date, Categories category)
-        {
-            this.id = id;
-            this.Name = name;
-            this.Author = author;
-            this.Description = description;
-            this.Date = date;
-            this.category = category;
-        }
+    public Recommendation(Guid id, string name, string author, string description, DateTime date, Categories category)
+    {
+        this.Id = id;
+        this.Name = name;
+        this.Author = author;
+        this.Description = description;
+        this.RecommendationDate = date;
+        this.category = category;
     }
 }
