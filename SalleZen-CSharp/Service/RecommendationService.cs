@@ -17,7 +17,7 @@ public class RecommendationService
         await _context.Recommendations.ToListAsync();  
 
     // Récupère une recommandation par ID
-    public async Task<Recommendation> GetByIdAsync(Guid id) =>
+    public async Task<Recommendation> GetByIdAsync(int id) =>
         await _context.Recommendations.FindAsync(id); 
 
     // Crée une nouvelle recommandation
@@ -28,7 +28,7 @@ public class RecommendationService
     }
 
     // Met à jour une recommandation existante
-    public async Task UpdateAsync(Guid id, Recommendation recommendationIn)
+    public async Task UpdateAsync(int id, Recommendation recommendationIn)
     {
         var recommendation = await _context.Recommendations.FindAsync(id);
         if (recommendation != null)
@@ -39,7 +39,7 @@ public class RecommendationService
     }
 
     // Supprime une recommandation par ID
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(int id)
     {
         var recommendation = await _context.Recommendations.FindAsync(id);
         if (recommendation != null)

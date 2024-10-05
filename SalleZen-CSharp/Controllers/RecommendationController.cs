@@ -26,8 +26,8 @@ public class RecommendationController : ControllerBase
     }
 
     // GET: api/recommendations/{id}
-    [HttpGet("{id:length(24)}", Name = "GetRecommendation")]
-    public async Task<ActionResult<Recommendation>> GetRecommendationById(Guid id)
+    [HttpGet("{id:int}", Name = "GetRecommendation")]
+    public async Task<ActionResult<Recommendation>> GetRecommendationById(int id)
     {
         var recommendation = await _recommendationService.GetByIdAsync(id);
 
@@ -50,8 +50,8 @@ public class RecommendationController : ControllerBase
     }
 
     // PUT: api/recommendations/{id}
-    [HttpPut("{id:length(24)}")]
-    public async Task<IActionResult> UpdateRecommendation(Guid id, Recommendation recommendationIn)
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateRecommendation(int id, Recommendation recommendationIn)
     {
         var recommendation = await _recommendationService.GetByIdAsync(id);
 
@@ -65,8 +65,8 @@ public class RecommendationController : ControllerBase
     }
 
     // DELETE: api/recommendations/{id}
-    [HttpDelete("{id:length(24)}")]
-    public async Task<IActionResult> DeleteRecommendation(Guid id)
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteRecommendation(int id)
     {
         var recommendation = await _recommendationService.GetByIdAsync(id);
 

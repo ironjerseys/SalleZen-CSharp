@@ -19,7 +19,7 @@ public class Recommendation
 
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public Guid Id { get; set; } 
+    public int Id { get; set; } 
 
     [Required]
     public string Name { get; set; }
@@ -35,7 +35,7 @@ public class Recommendation
 
     public Recommendation() { }
 
-    public Recommendation(Guid id, string name, string author, string description, DateTime date, Categories category)
+    public Recommendation(int id, string name, string author, string description, DateTime date, Categories category)
     {
         this.Id = id;
         this.Name = name;
