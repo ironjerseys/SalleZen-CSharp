@@ -6,20 +6,21 @@ namespace RecommendationList.Model;
 
 public class Recommendation
 {
-    [JsonConverter(typeof(JsonStringEnumConverter))] 
-    public enum Categories
+    public Recommendation() { }
+
+    public Recommendation(int id, string name, string author, string description, DateTime date, Categories category)
     {
-        Movie,
-        VideoGame,
-        TVshow,
-        Music,
-        YoutubeVideo,
-        Book
+        this.Id = id;
+        this.Name = name;
+        this.Author = author;
+        this.Description = description;
+        this.RecommendationDate = date;
+        this.category = category;
     }
 
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; } 
+    public int Id { get; set; }
 
     [Required]
     public string Name { get; set; }
@@ -33,15 +34,14 @@ public class Recommendation
     [Column(TypeName = "nvarchar(50)")]
     public Categories category { get; set; }
 
-    public Recommendation() { }
-
-    public Recommendation(int id, string name, string author, string description, DateTime date, Categories category)
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum Categories
     {
-        this.Id = id;
-        this.Name = name;
-        this.Author = author;
-        this.Description = description;
-        this.RecommendationDate = date;
-        this.category = category;
+        Movie,
+        VideoGame,
+        TVshow,
+        Music,
+        YoutubeVideo,
+        Book
     }
 }
