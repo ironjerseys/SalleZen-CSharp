@@ -1,9 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using RecommendationList.Data;
 using RecommendationList.Service;
+using SalleZen_CSharp;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Service de base de données SQL Server
+builder.Services.AddDbContext<RecommendationsListsDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("RecommendationsListsDbConnection")));
+
+// Health Check 
+builder.Services.AddHealthChecks().AddCheck<DatabaseHealthCheck>("Database");
 
 // Serilog
 Log.Logger = new LoggerConfiguration()
@@ -13,10 +21,6 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
-
-// Service de base de données SQL Server
-builder.Services.AddDbContext<RecommendationsListsDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("RecommendationsListsDbConnection")));
 
 // Ajouter les services CORS
 builder.Services.AddCors(options =>
@@ -31,9 +35,7 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Enregistrer RecommendationService comme Singleton
 builder.Services.AddScoped<RecommendationService>();
-
 builder.Services.AddSingleton(Log.Logger);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -42,6 +44,9 @@ builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 app.UseCors("AllowAngularApp");
+
+// Active le point d'accès Health Check
+app.MapHealthChecks("/health");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
